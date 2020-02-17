@@ -9,6 +9,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({extended: true}));
+
+const generateRandomString = () => {
+  let chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
+  let encodedString = '';
+  for (let i = encodedString.length; encodedString.length <= 5; i++){
+    randomNum = Math.floor(Math.random() * (36 - 0) + 0);
+    encodedString += chars[randomNum];
+  }
+  return encodedString;
+}
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -16,6 +29,16 @@ app.get("/", (req, res) => {
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render('urls_index',templateVars);
+});
+
+
+app.get('/urls/new', (req, res) => {
+  res.render('urls_new');
+});
+
+app.post('/urls', (req, res) => {
+  console.log(req.body);
+  res.send('ok');
 });
 
 app.get('/urls/:shortURL', (req, res) => {
