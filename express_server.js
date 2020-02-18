@@ -41,10 +41,9 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${newID}`);
 });
 
-app.post('/urls/:url/update', (req, res) => {
+app.post('/urls/:shortURL/update', (req, res) => {
   let newURL = req.body.longURL;
-  urlDatabase[req.params.url] = newURL;
-  console.log(urlDatabase)
+  urlDatabase[req.params.shortURL] = newURL;
   res.redirect('/urls');
 });
 
