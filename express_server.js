@@ -36,9 +36,15 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.post('/urls', (req, res) => {
-  let newID = generateRandomString()
+  let newID = generateRandomString();
   urlDatabase[newID] = req.body.longURL;
   res.redirect(`/urls/${newID}`);
+});
+
+app.post('/urls/:url/delete', (req, res) => {
+  let key = req.params;
+  delete urlDatabase[key.url];
+  res.redirect('/urls');
 });
 
 app.get('/urls/:shortURL', (req, res) => {
