@@ -41,6 +41,13 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${newID}`);
 });
 
+app.post('/urls/:url/update', (req, res) => {
+  let newURL = req.body.longURL;
+  urlDatabase[req.params.url] = newURL;
+  console.log(urlDatabase)
+  res.redirect('/urls');
+});
+
 app.post('/urls/:url/delete', (req, res) => {
   let key = req.params;
   delete urlDatabase[key.url];
