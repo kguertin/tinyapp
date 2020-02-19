@@ -56,29 +56,51 @@ app.get("/", (req, res) => {
 
 app.get('/urls', (req, res) => {
   let templateVars = { 
-    username: req.cookies["username"],
+    userID: userData[req.cookies['user_id']],
     urls: urlDatabase };
   res.render('urls_index',templateVars);
 });
 
 app.get('/urls/new', (req, res) => {
-  let templateVars = { username: req.cookies["username"] }
+  let templateVars = { userID: userData[req.cookies['user_id']] }
   res.render('urls_new', templateVars);
 });
 
 app.get('/register', (req, res) => {
-  let templateVars = { username: req.cookies["username"] };
+  let templateVars = { userID: userData[req.cookies['user_id']] };
   res.render('registration', templateVars);
 })
 
+app.get('/login', (req, res) => {
+  let templateVars = { userID: userData[req.cookies['user_id']] };
+  res.render('login', templateVars)
+})
+
 app.post('/login', (req, res) => {
-  let username = req.body.username;
-  res.cookie('username', username);
-  res.redirect('/urls');
+  let userEmail = req.body.email;
+  let userPassword = req.body.password;
+  let passwordMatch = false;
+  Object.keys(userData).forEach(user => {
+    if (userData[user].password === userPassword) {
+      passwordMatch = true;
+    }
+  })
+  if (!checkForEmail(userData, userEmail)){
+    res.status(403).send();
+  } else if (checkForEmail(userData, userEmail) && !passwordMatch){
+    res.status(403).send();
+  } else {
+    Object.keys(userData).forEach(user => {
+      if (userData[user].email === userEmail) {
+        res.cookie('user_id', userData[user].id)
+        res.redirect('/urls');
+      }
+    })
+  }
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username')
+  res.clearCookie('user_id')
   res.redirect('/urls')
 })
 
@@ -117,7 +139,7 @@ app.post('/register', (req, res) => {
 app.get('/urls/:shortURL', (req, res) => {
   let shortURL = req.params.shortURL;
   let templateVars = { 
-    username: req.cookies["username"],
+    userID: userData[req.cookies['user_id']],
     shortURL: shortURL,
     longURL: urlDatabase[shortURL]};
   res.render('urls_show', templateVars);
