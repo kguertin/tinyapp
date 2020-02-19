@@ -5,15 +5,6 @@ const PORT = 8080; // default port 8080
 // EJS Templates
 app.set('view engine', 'ejs');
 
-// Data
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
-
-const userData = {
-  
-}
 
 // Dependencies and Utility
 const bodyParser = require('body-parser');
@@ -30,6 +21,23 @@ const generateRandomString = () => {
     encodedString += chars[randomNum];
   }
   return encodedString;
+}
+
+// Data
+const urlDatabase = {
+  "b2xVn2": "http://www.lighthouselabs.ca",
+  "9sm5xK": "http://www.google.com"
+};
+
+const userData = {
+}
+
+class User {
+  constructor(id, email, password){
+    this.id = id; 
+    this.email = email;
+    this.password = password;
+  }
 }
 
 // Express Stuff
@@ -81,6 +89,15 @@ app.post('/urls/:shortURL/update', (req, res) => {
 app.post('/urls/:url/delete', (req, res) => {
   let key = req.params;
   delete urlDatabase[key.url];
+  res.redirect('/urls');
+});
+
+app.post('/register', (req, res) => {
+  const randomUserID = generateRandomString();
+  const userObject = new User (randomUserID, req.body.email, req.body.password);
+  userData[randomUserID] = userObject;
+  res.cookie('user_id', randomUserID);
+  console.log(userData);
   res.redirect('/urls');
 });
 
