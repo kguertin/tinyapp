@@ -23,6 +23,14 @@ const generateRandomString = () => {
   return encodedString;
 }
 
+const checkForEmail = (userData, email) => {
+  let emails = [];
+  Object.keys(userData).forEach( i => {
+    emails.push(userData[i].email);
+  })
+  return emails.find(e => email === e)
+}
+
 // Data
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -93,12 +101,17 @@ app.post('/urls/:url/delete', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  const randomUserID = generateRandomString();
-  const userObject = new User (randomUserID, req.body.email, req.body.password);
-  userData[randomUserID] = userObject;
-  res.cookie('user_id', randomUserID);
-  console.log(userData);
-  res.redirect('/urls');
+  if (!req.body.password || !req.body.email) {
+    res.status(400).send();
+  } else if (checkForEmail(userData, req.body.email)) {
+    res.status(400).send();
+  } else {
+    const randomUserID = generateRandomString();
+    const userObject = new User (randomUserID, req.body.email, req.body.password);
+    userData[randomUserID] = userObject;
+    res.cookie('user_id', randomUserID);
+    res.redirect('/urls');
+  }
 });
 
 app.get('/urls/:shortURL', (req, res) => {
