@@ -1,14 +1,17 @@
+// Set UP and Required
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-
+// EJS Templates
 app.set('view engine', 'ejs');
 
+// Data
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
+// Dependencies and Utility
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -16,14 +19,16 @@ const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
 const generateRandomString = () => {
-  let chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
+  const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
   let encodedString = '';
-  for (let i = encodedString.length; encodedString.length <= 5; i++){
+  for (let i = 0; encodedString.length <= 5; i++){
     randomNum = Math.floor(Math.random() * (36 - 0) + 0);
     encodedString += chars[randomNum];
   }
   return encodedString;
 }
+
+// Express Stuff
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -88,6 +93,8 @@ app.get('/hello', (req, res) => {
   let templateVars = { greeting: 'Hello World!'};
   res.render('hello_world', templateVars);
 });
+
+// Server Listen
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
