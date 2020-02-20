@@ -62,6 +62,14 @@ class User {
 
 // Express Stuff
 
+app.get('/', (req, res) => {
+  if (req.session.user_id){
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login')
+  }
+})
+
 app.get('/urls', (req, res) => {
   let userURLs = urlsForUser(req.session.user_id)
   let userShortUrls = shortURLForUsers(urlDatabase)
