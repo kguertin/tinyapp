@@ -6,13 +6,14 @@ const PORT = 8080; // default port 8080
 app.set('view engine', 'ejs');
 
 
-// Dependencies and Utility
+// Dependencies
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
+// Utility Functions
 const generateRandomString = () => {
   const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
   let encodedString = '';
@@ -31,14 +32,28 @@ const checkForEmail = (userData, email) => {
   return emails.find(e => email === e)
 }
 
-// Data
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
-
-const userData = {
+const urlsForUser = id => {
+  let usersURLs = [];
+  Object.keys(urlDatabase).forEach(url => {
+    if (urlDatabase[url].userID === id){
+      usersURLs.push(urlDatabase[url]);
+    }
+  });
+  return usersURLs
 }
+
+const shortURLForUsers = id => {
+  let shortURLs = [];
+  Object.keys(urlDatabase).forEach(key => {
+    shortURLs.push(key);
+  })
+  return shortURLs;
+}
+
+// Data
+const urlDatabase = {};
+
+const userData = {};
 
 class User {
   constructor(id, email, password){
@@ -55,10 +70,18 @@ app.get("/", (req, res) => {
 });
 
 app.get('/urls', (req, res) => {
+  let userURLs = urlsForUser(req.cookies['user_id'])
+  let userShortUrls = shortURLForUsers(req.cookies['user_id'])
   let templateVars = { 
     userID: userData[req.cookies['user_id']],
-    urls: urlDatabase };
-  res.render('urls_index',templateVars);
+    urls: userURLs, 
+    shortURL: userShortUrls};
+  if (req.cookies['user_id']){
+    res.render('urls_index',templateVars);
+  } else {
+    res.render('urls_index', {userID: undefined});
+  }
+
 });
 
 app.get('/urls/new', (req, res) => {
@@ -105,9 +128,13 @@ app.post('/logout', (req, res) => {
 })
 
 app.post('/urls', (req, res) => {
-  let newID = generateRandomString();
-  urlDatabase[newID] = req.body.longURL;
-  res.redirect(`/urls/${newID}`);
+  if (req.cookies['user_id']){
+    let newID = generateRandomString();
+    urlDatabase[newID] = {longURL: req.body.longURL, userID: req.cookies['user_id']};
+    res.redirect(`/urls/${newID}`);
+  } else {
+    res.redirect('/urls');
+  }
 });
 
 app.post('/urls/:shortURL/update', (req, res) => {
@@ -141,7 +168,8 @@ app.get('/urls/:shortURL', (req, res) => {
   let templateVars = { 
     userID: userData[req.cookies['user_id']],
     shortURL: shortURL,
-    longURL: urlDatabase[shortURL]};
+    urlDatabase: urlDatabase,
+    longURL: urlDatabase[shortURL].longURL};
   res.render('urls_show', templateVars);
 });
 

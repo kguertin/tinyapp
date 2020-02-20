@@ -9,6 +9,7 @@
 <body>
   <%- include('./partials/_header') %>
   <main style="margin: 1em;">
+    <% if(userID) { %>
     <h3>My URLs</h3>
     <table class="table">
       <thead>
@@ -22,13 +23,13 @@
       <tbody>
         <% for(let url in urls) { %>
           <tr>
-            <td><%= url %></td>
-            <td><%= urls[url] %></td>
+            <td><%= shortURL[url] %></td>
+            <td><%= url.longURL %></td>
             <td>
-              <a href="./urls/<%= url %>" class="btn btn-outline-success">EDIT</a>
+              <a href="./urls/<%= shortURL[url] %>" class="btn btn-outline-success">EDIT</a>
             </td>
             <td>
-              <form method="post" action="/urls/<%= url %>/delete ">
+              <form method="post" action="/urls/<%= shortURL[url] %>/delete ">
               <button class="btn btn-outline-danger">DELETE</button>
             </form>
             </td>
@@ -36,6 +37,9 @@
         <% } %>
       </tbody>
     </table>
+    <% } else {%>
+      <h1 style="text-align: center; margin-top: 30px;">Please Log In To Access Your URLs</h1>
+    <% } %>
   </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
