@@ -4,8 +4,11 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["screenshot description"](#)
-!["screenshot description"](#)
+!["URL Index page showing added URL's and their unique ID's"](https://github.com/kguertin/tinyapp/blob/master/docs/URL_index.png?raw=true)
+
+!["Page for creating shortened URL's](https://github.com/kguertin/tinyapp/blob/master/docs/Create_URL.png?raw=true)
+
+!["Page displaying shortene URL with an option to edit where the URL the unique ID points to.](https://github.com/kguertin/tinyapp/blob/master/docs/Display_Short_URL.png?raw=true)
 
 ## Dependencies
 The following dependencies made this project possible: 
