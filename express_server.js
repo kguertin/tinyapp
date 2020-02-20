@@ -2,6 +2,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
+const bcrypt = require('bcrypt');
 // EJS Templates
 app.set('view engine', 'ejs');
 
@@ -42,9 +43,9 @@ const urlsForUser = id => {
   return usersURLs
 }
 
-const shortURLForUsers = id => {
+const shortURLForUsers = data => {
   let shortURLs = [];
-  Object.keys(urlDatabase).forEach(key => {
+  Object.keys(data).forEach(key => {
     shortURLs.push(key);
   })
   return shortURLs;
@@ -65,13 +66,9 @@ class User {
 
 // Express Stuff
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
 app.get('/urls', (req, res) => {
   let userURLs = urlsForUser(req.cookies['user_id'])
-  let userShortUrls = shortURLForUsers(req.cookies['user_id'])
+  let userShortUrls = shortURLForUsers(urlDatabase)
   let templateVars = { 
     userID: userData[req.cookies['user_id']],
     urls: userURLs, 
@@ -81,7 +78,6 @@ app.get('/urls', (req, res) => {
   } else {
     res.render('urls_index', {userID: undefined});
   }
-
 });
 
 app.get('/urls/new', (req, res) => {
@@ -101,13 +97,18 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
   let userEmail = req.body.email;
-  let userPassword = req.body.password;
+  let userPassword = '';
   let passwordMatch = false;
   Object.keys(userData).forEach(user => {
-    if (userData[user].password === userPassword) {
-      passwordMatch = true;
+    if (userData[user].email === userEmail){
+      return userPassword = userData[user].password;
     }
   })
+
+  if (bcrypt.compareSync(req.body.password, userPassword)) {
+    passwordMatch = true;
+  }
+
   if (!checkForEmail(userData, userEmail)){
     res.status(403).send();
   } else if (checkForEmail(userData, userEmail) && !passwordMatch){
@@ -160,7 +161,9 @@ app.post('/register', (req, res) => {
     res.status(400).send();
   } else {
     const randomUserID = generateRandomString();
-    const userObject = new User (randomUserID, req.body.email, req.body.password);
+    const userPassword = req.body.password;
+    const hashedPassword = bcrypt.hashSync(userPassword, 10)
+    const userObject = new User (randomUserID, req.body.email, hashedPassword);
     userData[randomUserID] = userObject;
     res.cookie('user_id', randomUserID);
     res.redirect('/urls');
@@ -184,11 +187,6 @@ app.get('/urls/:shortURL', (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
-});
-
-app.get('/hello', (req, res) => {
-  let templateVars = { greeting: 'Hello World!'};
-  res.render('hello_world', templateVars);
 });
 
 // Server Listen
