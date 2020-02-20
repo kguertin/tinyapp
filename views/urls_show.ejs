@@ -11,6 +11,7 @@
   <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
+      <% if (hasAccess) { %>
         <h5 class="card-title">TinyURL for: <%= longURL %></h5>
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
       </div>
@@ -21,6 +22,9 @@
           <input type="text" name="longURL" id="longURL" style="margin: 0 10px;">
           <button class="btn btn-primary">SUBMIT</button>
         </form>
+      <% } else { %>
+        <h1 style="text-align: center; margin-top: 30px;">No URL Here</h1>
+      <% } %>
     </div>
   </div>
   <!-- Bootstrap JS -->
