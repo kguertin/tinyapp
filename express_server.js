@@ -50,6 +50,13 @@ const shortURLForUsers = data => {
   return shortURLs;
 };
 
+const checkPassword = (enteredPass, hashedPass) => {
+  if (bcrypt.compareSync(enteredPass, hashedPass)) {
+    return true;
+  }
+  return false;
+}
+
 // Data
 const urlDatabase = {};
 
@@ -119,28 +126,16 @@ app.post('/login', (req, res) => {
 
   if (!req.body.password || !req.body.email) {
     return res.status(403).send();
-  }
+  };
 
   let userEmail = req.body.email;
   let user = getUserByEmail(userData, userEmail);
-  let userPassword = user.password;
-  let passwordMatch = false;
 
-  if (bcrypt.compareSync(req.body.password, userPassword)) {
-    passwordMatch = true;
-  }
-
-  if (!getUserByEmail(userData, userEmail)) {
-    res.status(403).send();
-  } else if (getUserByEmail(userData, userEmail) && !passwordMatch) {
-    res.status(403).send();
+  if (user && checkPassword(req.body.password, user.password)) {
+    req.session.userID =  user.id;
+    res.redirect('/urls');
   } else {
-    Object.keys(userData).forEach(user => {
-      if (userData[user].email === userEmail) {
-        req.session.userID =  userData[user].id;
-        res.redirect('/urls');
-      }
-    });
+    res.status(403).send();
   }
 });
 
@@ -201,6 +196,7 @@ app.post('/urls/:shortURL/update', (req, res) => {
 app.post('/urls/:url/delete', (req, res) => {
 
   let key = req.params;
+
   if (urlDatabase[key.url].userID === req.session.userID) {
     delete urlDatabase[key.url];
     res.redirect('/urls');
