@@ -19,8 +19,6 @@ app.use(cookieSession({
   secret: 'secret'
 }));
 
-// Middlewear 
-
 // Utility Functions
 const generateRandomString = () => {
   const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
@@ -55,7 +53,7 @@ const checkPassword = (enteredPass, hashedPass) => {
     return true;
   }
   return false;
-}
+};
 
 // Data
 const urlDatabase = {};
@@ -126,7 +124,7 @@ app.post('/login', (req, res) => {
 
   if (!req.body.password || !req.body.email) {
     return res.status(403).send();
-  };
+  }
 
   let userEmail = req.body.email;
   let user = getUserByEmail(userData, userEmail);
@@ -162,7 +160,7 @@ app.get('/urls', (req, res) => {
 
 app.post('/urls', (req, res) => {
   
-  if (!req.session.userID){
+  if (!req.session.userID) {
     return res.status(404).send();
   }
 
@@ -207,7 +205,7 @@ app.post('/urls/:url/delete', (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
 
-  if (!Object.keys(urlDatabase).find(k => k === req.params.shortURL)){
+  if (!Object.keys(urlDatabase).find(k => k === req.params.shortURL)) {
     res.status(404).send();
     return;
   }
@@ -229,16 +227,16 @@ app.get('/urls/:shortURL', (req, res) => {
 app.post('/urls/:shortURL', (req, res) => {
   if (!req.session.userID) {
     return res.status(404).send();
-  } else if (urlDatabase[key.url].userID !== req.session.userID){
+  } else if (urlDatabase[req.params].userID !== req.session.userID) {
     return res.status(404).send();
   }
   res.redirect('/urls/:shortURL');
-})
+});
 
 // Shareable Link
 app.get("/u/:shortURL", (req, res) => {
 
-  if (!Object.keys(urlDatabase).find(k => k === req.params.shortURL)){
+  if (!Object.keys(urlDatabase).find(k => k === req.params.shortURL)) {
     res.status(404).send();
     return;
   }
